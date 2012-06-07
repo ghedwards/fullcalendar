@@ -48,11 +48,13 @@ js('util.js');
 
 js('basic/MonthView.js');
 js('basic/BasicWeekView.js');
+js('basic/BasicMultidayView.js');
 js('basic/BasicDayView.js');
 js('basic/BasicView.js');
 js('basic/BasicEventRenderer.js');
 
 js('agenda/AgendaWeekView.js');
+js('agenda/AgendaMultidayView.js');
 js('agenda/AgendaDayView.js');
 js('agenda/AgendaView.js');
 js('agenda/AgendaEventRenderer.js');

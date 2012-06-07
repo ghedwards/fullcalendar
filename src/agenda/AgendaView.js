@@ -298,12 +298,24 @@ function AgendaView(element, calendar, viewName) {
 		slotTableFirstInner = slotTable.find('div:first');
 		
 		slotBind(slotTable.find('td'));
-		
+                if (viewName != 'agendaDay'){
+                    dayHeadBind(dayHead.find('th').slice(1, -1));
+                }
 		axisFirstCells = axisFirstCells.add(slotTable.find('th:first'));
 	}
 	
+	function dayHeadBind(cells){
+            cells.addClass("fc-dayheads")
+            cells.click(dayHeadClick);
+        }
 	
-	
+        function dayHeadClick(ev){
+            cells = dayHead.find('th').slice(1, -1);
+            clickedDate = new Date(t.start.getTime() + 86400000*cells.index(ev.target));
+            t.calendar.changeView('agendaDay');
+            t.calendar.gotoDate(clickedDate);
+        }
+        
 	function updateCells() {
 		var i;
 		var headCell;
