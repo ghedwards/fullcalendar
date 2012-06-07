@@ -1,4 +1,3 @@
-
 FullCalendar - Full-sized drag & drop event calendar
 ====================================================
 
@@ -51,3 +50,46 @@ Here is an example of doing it within an element having an `id` of `calendar`:
 	});
 	
 To see a full list of all available options, please consult the [FullCalendar documentation &raquo;](http://arshaw.com/fullcalendar/docs/)
+
+
+Additional Features available in this forked version of Full Calendar
+---------------------------------------------------------------------
+
+Views
+-----
+
+agendaMultiday / basicDay
+
+Multiday view provides a view that supports customizable multiple day rendering (one similar to Week View). 
+
+The numbers of day to render can be customized by setting daysinmultiday option. Default value is 5.
+Hide weekends is not available in this view.
+For titleFormat, columnFormat, buttonText use multiday option to set text.
+
+The example below renders multiday view fo calendar for 6 days
+
+	$(document).ready(function() {
+	
+		$('#calendar').fullCalendar({
+			defaultView:'agendaMultiday',
+			daysinmultiday: 6,
+			titleFormat: {
+				multiday : "MMM d[ yyyy]{ '&#8212;'[ MMM] d yyyy}",
+				},
+			columnFormat: {
+				multiday: 'dddd M/d'
+				},
+			buttonText: {
+				multiday: 'multiday'
+				}
+		});
+	
+	});
+	
+
+General Options
+----------------
+
+allDaySlotAutoHide : boolean
+
+allDaySlotAutoHide hides the allDaySlot in agenda views when there are no all day events rendered in view
