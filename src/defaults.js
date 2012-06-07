@@ -12,6 +12,7 @@ var defaults = {
 	weekends: true,
 	currentTimeIndicator: false,
 	
+	daysinmultiday:4,
 	// editing
 	//editable: false,
 	//disableDragging: false,
@@ -31,14 +32,16 @@ var defaults = {
 		week: "MMM d[ yyyy]{ '&#8212;'[ MMM] d yyyy}",
 		day: 'dddd, MMM d, yyyy',
 		list: 'MMM d, yyyy',
-		table: 'MMM d, yyyy'
+		table: 'MMM d, yyyy',
+		multiday: "MMM d[ yyyy]{ '&#8212;'[ MMM] d yyyy}"
 	},
 	columnFormat: {
 		month: 'ddd',
 		week: 'ddd M/d',
 		day: 'dddd M/d',
 		list: 'dddd, MMM d, yyyy',
-		table: 'MMM d, yyyy'
+		table: 'MMM d, yyyy',
+		multiday: 'dddd M/d'
 	},
 	timeFormat: { // for event elements
 		'': 'h(:mm)t' // default
@@ -56,12 +59,14 @@ var defaults = {
 		next: '&nbsp;&#9658;&nbsp;',
 		prevYear: '&nbsp;&lt;&lt;&nbsp;',
 		nextYear: '&nbsp;&gt;&gt;&nbsp;',
-		today: 'today',
-		month: 'month',
-		week: 'week',
-		day: 'day',
+		today: 'Today',
+		month: 'Month',
+		week: 'Week',
+		day: 'Day',
 		list: 'list',
-		table: 'table'
+		table: 'Agenda',
+		resourceDay: 'resource',
+		agendaMultiday: '4 Days'
 	},
 	listTexts: {
 		until: 'until',
