@@ -80,7 +80,7 @@ function addMinutes(d, n) {
 function clearTime(d) {
 	d.setHours(0);
 	d.setMinutes(0);
-	d.setSeconds(0); 
+	d.setSeconds(0);
 	d.setMilliseconds(0);
 	return d;
 }
@@ -152,17 +152,64 @@ function parseDate(s, ignoreTimezone) { // ignoreTimezone defaults to true
 		if (ignoreTimezone === undefined) {
 			ignoreTimezone = true;
 		}
-		return parseISO8601(s, ignoreTimezone) || (s ? new Date(s) : null);
+		return parseISO8601(s, ignoreTimezone) || parseDateString(s) || ( s ? new Date(s) : null);
 	}
 	// TODO: never return invalid dates (like from new Date(<string>)), return null instead
 	return null;
 }
 
+// Parse dates that look like a date ( Chrome doesn't seem to mind dates that look like this ? )
+function parseDateString(s) {
+
+	if ( s === undefined || s === null ) {
+		return null;
+	}
+
+	var tmp = s.match(/^[^0-9]*([0-9]{4}-[0-9]{2}-[0-9]{2})?[\sa-z]{0,2}([0-9]{1,2}:[0-9]{2})?[^\n\r]*$/i), tmpDate;
+
+	if ( tmp && tmp[1] ) {
+		
+		tmpDate = new Date(1900,1,1,0,0,0);
+		
+		if ( tmp[1].indexOf("-") != -1 ) {
+			tmpDate = new Date(tmp[1].split("-")[0],parseInt(tmp[1].split("-")[1].replace(/^0/i,''),10)-1,tmp[1].split("-")[2],0,0,0);
+		} else if ( tmp[1].indexOf(":") != -1 ) {
+			tmpDate.setHours(tmp[1].split(":")[0]);
+			tmpDate.setMinutes(tmp[1].split(":")[1]);
+		}
+
+		if ( tmp[2] && tmp[2].indexOf(":") != -1 ) {
+			tmpDate.setHours(tmp[2].split(":")[0]);
+		
+			if ( s.match(/[P]{1}[M]?/i) && tmpDate.getHours() < 12 ) {
+				tmpDate.setHours(tmpDate.getHours()+12);
+			} else if ( s.match(/[A]{1}[M]?/i) && tmpDate.getHours() == 12 ) {
+				tmpDate.setHours(0);
+			}
+				
+			
+			tmpDate.setMinutes(tmp[2].split(":")[1]);
+		}
+		
+		return tmpDate;
+		
+	} else {
+
+		tmpDate = new Date(Date.parse(s));
+		
+		if ( isNaN(tmpDate.getDate()) !== true ) {
+			return tmpDate;
+		} else {
+			return null;
+		}
+		
+	}
+}
 
 function parseISO8601(s, ignoreTimezone) { // ignoreTimezone defaults to false
 	// derived from http://delete.me.uk/2005/03/iso8601.html
 	// TODO: for a know glitch/feature, read tests/issue_206_parseDate_dst.html
-	var m = s.match(/^([0-9]{4})(-([0-9]{2})(-([0-9]{2})([T ]([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?(Z|(([-+])([0-9]{2})(:?([0-9]{2}))?))?)?)?)?$/);
+	var m = s.match(/^([0-9]{4})(\-([0-9]{2})(-([0-9]{2})([T ]([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?(Z|(([\-+])([0-9]{2})(:?([0-9]{2}))?))?)?)?)?$/);
 	if (!m) {
 		return null;
 	}
@@ -251,7 +298,7 @@ function formatDates(date1, date2, format, options) {
 		otherDate = date2,
 		i, len = format.length, c,
 		i2, formatter,
-		res = '';
+		res = '', subres;
 	for (i=0; i<len; i++) {
 		c = format.charAt(i);
 		if (c == "'") {
@@ -272,7 +319,7 @@ function formatDates(date1, date2, format, options) {
 		else if (c == '(') {
 			for (i2=i+1; i2<len; i2++) {
 				if (format.charAt(i2) == ')') {
-					var subres = formatDate(date, format.substring(i+1, i2), options);
+					subres = formatDate(date, format.substring(i+1, i2), options);
 					if (parseInt(subres.replace(/\D/, ''), 10)) {
 						res += subres;
 					}
@@ -285,7 +332,7 @@ function formatDates(date1, date2, format, options) {
 			for (i2=i+1; i2<len; i2++) {
 				if (format.charAt(i2) == ']') {
 					var subformat = format.substring(i+1, i2);
-					var subres = formatDate(date, subformat, options);
+					subres = formatDate(date, subformat, options);
 					if (subres != formatDate(otherDate, subformat, options)) {
 						res += subres;
 					}
@@ -304,7 +351,8 @@ function formatDates(date1, date2, format, options) {
 		}
 		else {
 			for (i2=len; i2>i; i2--) {
-				if (formatter = dateFormatters[format.substring(i, i2)]) {
+				formatter = dateFormatters[format.substring(i, i2)];
+				if (formatter) {
 					if (date) {
 						res += formatter(date, options);
 					}
@@ -320,33 +368,33 @@ function formatDates(date1, date2, format, options) {
 		}
 	}
 	return res;
-};
+}
 
 
 var dateFormatters = {
-	s	: function(d)	{ return d.getSeconds() },
-	ss	: function(d)	{ return zeroPad(d.getSeconds()) },
-	m	: function(d)	{ return d.getMinutes() },
-	mm	: function(d)	{ return zeroPad(d.getMinutes()) },
-	h	: function(d)	{ return d.getHours() % 12 || 12 },
-	hh	: function(d)	{ return zeroPad(d.getHours() % 12 || 12) },
-	H	: function(d)	{ return d.getHours() },
-	HH	: function(d)	{ return zeroPad(d.getHours()) },
-	d	: function(d)	{ return d.getDate() },
-	dd	: function(d)	{ return zeroPad(d.getDate()) },
-	ddd	: function(d,o)	{ return o.dayNamesShort[d.getDay()] },
-	dddd: function(d,o)	{ return o.dayNames[d.getDay()] },
-	M	: function(d)	{ return d.getMonth() + 1 },
-	MM	: function(d)	{ return zeroPad(d.getMonth() + 1) },
-	MMM	: function(d,o)	{ return o.monthNamesShort[d.getMonth()] },
-	MMMM: function(d,o)	{ return o.monthNames[d.getMonth()] },
-	yy	: function(d)	{ return (d.getFullYear()+'').substring(2) },
-	yyyy: function(d)	{ return d.getFullYear() },
-	t	: function(d)	{ return d.getHours() < 12 ? 'a' : 'p' },
-	tt	: function(d)	{ return d.getHours() < 12 ? 'am' : 'pm' },
-	T	: function(d)	{ return d.getHours() < 12 ? 'A' : 'P' },
-	TT	: function(d)	{ return d.getHours() < 12 ? 'AM' : 'PM' },
-	u	: function(d)	{ return formatDate(d, "yyyy-MM-dd'T'HH:mm:ss'Z'") },
+	s	: function(d)	{ return d.getSeconds(); },
+	ss	: function(d)	{ return zeroPad(d.getSeconds()); },
+	m	: function(d)	{ return d.getMinutes(); },
+	mm	: function(d)	{ return zeroPad(d.getMinutes()); },
+	h	: function(d)	{ return d.getHours() % 12 || 12; },
+	hh	: function(d)	{ return zeroPad(d.getHours() % 12 || 12); },
+	H	: function(d)	{ return d.getHours(); },
+	HH	: function(d)	{ return zeroPad(d.getHours()); },
+	d	: function(d)	{ return d.getDate(); },
+	dd	: function(d)	{ return zeroPad(d.getDate()); },
+	ddd	: function(d,o)	{ return o.dayNamesShort[d.getDay()]; },
+	dddd: function(d,o)	{ return o.dayNames[d.getDay()]; },
+	M	: function(d)	{ return d.getMonth() + 1; },
+	MM	: function(d)	{ return zeroPad(d.getMonth() + 1); },
+	MMM	: function(d,o)	{ return o.monthNamesShort[d.getMonth()]; },
+	MMMM: function(d,o)	{ return o.monthNames[d.getMonth()]; },
+	yy	: function(d)	{ return (d.getFullYear()+'').substring(2); },
+	yyyy: function(d)	{ return d.getFullYear(); },
+	t	: function(d)	{ return d.getHours() < 12 ? 'a' : 'p'; },
+	tt	: function(d)	{ return d.getHours() < 12 ? 'am' : 'pm'; },
+	T	: function(d)	{ return d.getHours() < 12 ? 'A' : 'P'; },
+	TT	: function(d)	{ return d.getHours() < 12 ? 'AM' : 'PM'; },
+	u	: function(d)	{ return formatDate(d, "yyyy-MM-dd'T'HH:mm:ss'Z'"); },
 	S	: function(d)	{
 		var date = d.getDate();
 		if (date > 10 && date < 20) {
