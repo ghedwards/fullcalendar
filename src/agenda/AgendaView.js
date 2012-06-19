@@ -147,7 +147,7 @@ function AgendaView(element, calendar, viewName) {
 	function updateOptions() {
 		tm = opt('theme') ? 'ui' : 'fc';
 		nwe = opt('weekends') ? 0 : 1;
-		firstDay = opt('firstDay');
+                firstDay = (t.name=="agendaMultiday" || t.name=="basicMultiday") ? t.visStart.getDay(): opt('firstDay');
 		if (rtl = opt('isRTL')) {
 			dis = -1;
 			dit = colCnt - 1;
@@ -609,14 +609,8 @@ function AgendaView(element, calendar, viewName) {
 	
 	
 	function dayOfWeekCol(dayOfWeek) {
-            if (t.name=="agendaMultiday" || t.name=="basicMultiday"){
-                var firstDayOfCal = t.visStart.getDay();
                 var dow = (dayOfWeek < firstDay) ? (dayOfWeek + 7) : dayOfWeek;
-                return ((dow - Math.max(firstDayOfCal, nwe) + colCnt) % colCnt)*dis+dit;
-            }
-            else{
-                return ((dayOfWeek - Math.max(firstDay, nwe) + colCnt) % colCnt)*dis+dit;
-            }
+                return ((dow - Math.max(firstDay, nwe) + colCnt) % colCnt)*dis+dit;
 	}
 	
 	

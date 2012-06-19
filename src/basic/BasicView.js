@@ -108,7 +108,7 @@ function BasicView(element, calendar, viewName) {
 			dis = 1;
 			dit = 0;
 		}
-		firstDay = opt('firstDay');
+                firstDay = (t.name=="agendaMultiday" || t.name=="basicMultiday") ? t.visStart.getDay(): opt('firstDay');
 		nwe = opt('weekends') ? 0 : 1;
 		tm = opt('theme') ? 'ui' : 'fc';
 		colFormat = opt('columnFormat');
@@ -463,7 +463,8 @@ function BasicView(element, calendar, viewName) {
 	
 	
 	function dayOfWeekCol(dayOfWeek) {
-		return ((dayOfWeek - Math.max(firstDay, nwe) + colCnt) % colCnt) * dis + dit;
+                var dow = (dayOfWeek < firstDay) ? (dayOfWeek + 7) : dayOfWeek;
+                return ((dow - Math.max(firstDay, nwe) + colCnt) % colCnt)*dis+dit;
 	}
 	
 	
